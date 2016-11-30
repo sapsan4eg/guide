@@ -1,7 +1,7 @@
 [package]
 name = "guide"
 version = "0.1.0"
-authors = ["y.nasyrov <y.nasyrov@xsolla.com>"]
+authors = ["y.nasyrov <sapsan4eg@ya.ru>"]
 description = "Router based on iron-router for the Iron web framework."
 license = "MIT"
 repository = "https://github.com/sapsan4eg/guide"
