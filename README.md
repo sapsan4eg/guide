@@ -1,4 +1,4 @@
-Dialog [![Build Status](https://secure.travis-ci.org/sapsan4eg/guide.png?branch=master)](https://travis-ci.org/iron/router)
+Dialog [![Build Status](https://travis-ci.org/sapsan4eg/guide.svg?branch=master)](https://travis-ci.org/iron/router)
 ======
 
 > Simple router for the [Iron](https://github.com/iron/iron) web framework.
