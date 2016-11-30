@@ -1,0 +1,14 @@
+[package]
+name = "guide"
+version = "0.1.0"
+authors = ["y.nasyrov <y.nasyrov@xsolla.com>"]
+description = "Router based on iron-router for the Iron web framework."
+license = "MIT"
+repository = "https://github.com/sapsan4eg/guide"
+keywords = ["guide", "iron", "web", "http", "routing", "router", "another-router"]
+
+[dependencies]
+route-recognizer = "0.1"
+iron = "0.4"
+url = "1.1"
+mount = "0.2"
