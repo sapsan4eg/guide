@@ -231,6 +231,10 @@ impl Router {
     }
 }
 
+pub fn get_parameter(req: &mut Request, str: &str) -> String {
+    req.extensions.get::<Router>().unwrap_or(&Params::new()).find(str).unwrap_or("").to_string()
+}
+
 impl Handler for Router {
     fn handle(&self, req: &mut Request) -> IronResult<Response> {
         let path = req.url.path().join("/");
