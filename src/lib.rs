@@ -7,4 +7,4 @@ pub mod router;
 pub mod url_for;
 
 pub use url_for::url_for;
-pub use router::{RouteHandler, Router, RouterError, get_parameter};
+pub use router::{RouteHandler, Router, RouterError, get_parameter, requested_url};

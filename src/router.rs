@@ -8,6 +8,7 @@ use std::fmt;
 use iron::typemap::Key;
 use recognizer::{Match, Params};
 use mount;
+use url;
 
 pub trait RouteHandler: Send + Sync + 'static {
     fn handle(&self, &mut Request, &str) -> IronResult<Response>;
@@ -233,6 +234,13 @@ impl Router {
 
 pub fn get_parameter(req: &mut Request, str: &str) -> String {
     req.extensions.get::<Router>().unwrap_or(&Params::new()).find(str).unwrap_or("").to_string()
+}
+
+pub fn requested_url(req: &mut Request) -> url::Url {
+    match req.extensions.get::<mount::OriginalUrl>() {
+        Some(original) => original.clone().into_generic_url(),
+        None => req.url.clone().into_generic_url()
+    }
 }
 
 impl Handler for Router {
