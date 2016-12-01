@@ -30,9 +30,21 @@ pub fn url_for(request: &Request, route_id: &str, params: HashMap<String, String
 
 fn url_for_impl(url: &mut Url, glob: &str, mut params: HashMap<String, String>) {
     {
+        let globs = glob.split('/');
+        let globs_count = globs.clone().filter(|x| *x != "").count();
+        let segments_count = url.path_segments().unwrap().count();
         let mut url_path_segments = url.path_segments_mut().unwrap();
-        url_path_segments.clear();
-        for path_segment in glob.split('/') {
+
+        if globs_count < segments_count {
+            for _ in 0..globs_count+1 {
+                url_path_segments.pop();
+            }
+        } else {
+            url_path_segments.clear();
+        }
+
+        let mut idx = 0;
+        for path_segment in globs {
             if path_segment.len() > 1 && (path_segment.starts_with(':') || path_segment.starts_with('*')) {
                 let key = &path_segment[1..];
                 match params.remove(key) {
@@ -40,7 +52,11 @@ fn url_for_impl(url: &mut Url, glob: &str, mut params: HashMap<String, String>) 
                     None => panic!("No value for key {}", key)
                 };
             } else {
-                url_path_segments.push(path_segment);
+                if idx == 0 && path_segment == "" {
+                    idx += 1;
+                } else {
+                    url_path_segments.push(path_segment);
+                }
             }
         }
     }
@@ -80,5 +96,16 @@ mod test {
             rv
         });
         assert_eq!(url.to_string(), "http://localhost/foo/bam/");
+    }
+
+    #[test]
+    fn test_with_mount() {
+        let mut url = "http://localhost/mounted/foo/bar/baz".parse().unwrap();
+        url_for_impl(&mut url, "/foo/:user/", {
+            let mut rv = HashMap::new();
+            rv.insert("user".into(), "bam".into());
+            rv
+        });
+        assert_eq!(url.to_string(), "http://localhost/mounted/foo/bam/");
     }
 }
