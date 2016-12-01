@@ -1,9 +1,11 @@
 extern crate iron;
 extern crate guide;
+extern crate mount;
 
 use iron::{Iron, Request, Response, IronResult, method, IronError, status};
 use guide::{Router, RouteHandler, RouterError};
 use std::collections::HashMap;
+use mount::Mount;
 
 struct DummyController;
 struct DummyTwoController;
@@ -40,14 +42,16 @@ impl RouteHandler for DummyTwoController {
 }
 
 fn main() {
+    let mut mount = Mount::new();
     let mut router = Router::new();
     router.link(DummyController);
     router.link(DummyTwoController);
     router.route(method::Get, "/", "handler");
-    router.route(method::Post, "/hello", "another");
-    router.route(method::Get, "/hi/:everybody", "someone");
+    router.post("/hello", "another");
+    router.get("/hi/:everybody", "someone");
     router.any("/hello", "anys");
-
-    Iron::new(router).http("localhost:3000").unwrap();
+    mount
+        .mount("api", router);
+    Iron::new(mount).http("localhost:3000").unwrap();
 }
 
