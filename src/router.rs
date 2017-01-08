@@ -135,6 +135,9 @@ impl Router {
                         Some(&RouterError::MethodNotAllowed) => {
                             return Err(IronError::new(RouterError::MethodNotAllowed, status::MethodNotAllowed))
                         },
+                        Some(&RouterError::BadRequest) => {
+                            return Err(IronError::new(RouterError::BadRequest, status::MethodNotAllowed))
+                        },
                         None => {
                             return Err(err)
                         }
