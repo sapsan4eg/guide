@@ -264,7 +264,9 @@ pub enum RouterError {
     /// The error thrown by router if a request was redirected by adding or removing a trailing slash.
     TrailingSlash,
     /// This middleware not support that route_id
-    NextMiddleware
+    NextMiddleware,
+    ///
+    BadRequest
 }
 
 
@@ -280,7 +282,8 @@ impl Error for RouterError {
             RouterError::MethodNotAllowed => "Method Not Allowed",
             RouterError::NotFound => "No matching route found.",
             RouterError::TrailingSlash => "The request had a trailing slash.",
-            RouterError::NextMiddleware => "This is middleware not support this request"
+            RouterError::NextMiddleware => "This is middleware not support this request",
+            RouterError::BadRequest => "This is not valid request"
         }
     }
 }
