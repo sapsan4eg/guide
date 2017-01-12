@@ -8,7 +8,6 @@ use std::fmt;
 use iron::typemap::Key;
 use recognizer::{Match, Params};
 use mount;
-use url;
 
 pub trait RouteHandler: Send + Sync + 'static {
     fn handle(&self, &mut Request, &str) -> IronResult<Response>;
@@ -158,10 +157,7 @@ impl Router {
         }
 
         if let Some(last_char) = path.chars().last() {
-            // Unwrap generic URL to get access to its path components.
-            let mut generic_url = url.into_generic_url();
-            {
-                let mut path_segments = generic_url.path_segments_mut().unwrap();
+                let mut path_segments = url.as_mut().path_segments_mut().unwrap();
                 if last_char == '/' {
                     // We didn't recognize anything without a trailing slash; try again with one appended.
                     path.pop();
@@ -171,8 +167,6 @@ impl Router {
                     path.push('/');
                     path_segments.push("");
                 }
-            }
-            url = Url::from_generic_url(generic_url).unwrap();
         }
 
         self.recognize(&req.method, &path).ok().and(
@@ -219,7 +213,7 @@ impl Router {
             Err(_) => {
                 match self.redirect_slash(req) {
                     Some(err) => Err(err),
-                    None => //Err(IronError::new(RouterError::NotFound, status::NotFound))
+                    None =>
                         match req.method {
                             method::Options => Ok(self.handle_options(&path)),
                             // For HEAD, fall back to GET. Hyper ensures no response body is written.
@@ -239,10 +233,10 @@ pub fn get_parameter(req: &mut Request, str: &str) -> String {
     req.extensions.get::<Router>().unwrap_or(&Params::new()).find(str).unwrap_or("").to_string()
 }
 
-pub fn requested_url(req: &mut Request) -> url::Url {
+pub fn requested_url(req: &mut Request) -> Url {
     match req.extensions.get::<mount::OriginalUrl>() {
-        Some(original) => original.clone().into_generic_url(),
-        None => req.url.clone().into_generic_url()
+        Some(original) => original.clone(),
+        None => req.url.clone()
     }
 }
 

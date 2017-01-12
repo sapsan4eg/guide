@@ -20,18 +20,18 @@ pub fn url_for(request: &Request, route_id: &str, params: HashMap<String, String
     let mut base_path: String = "".to_string();
 
     if let Some(original) = request.extensions.get::<mount::OriginalUrl>() {
-        url =  original.clone().into_generic_url();
-        let routed = request.url.clone().into_generic_url();
+        url =  original.clone();
+        let routed = request.url.clone();
         base_path = take_base_path(url.path(), routed.path());
     } else {
-        url = request.url.clone().into_generic_url();
+        url = request.url.clone();
     }
 
-    url_for_impl(&mut url, glob, params, base_path);
-    ::iron::Url::from_generic_url(url).unwrap()
+    url_for_impl(url.as_mut(), glob, params, base_path);
+    url
 }
 
-fn take_base_path(requested: &str, routed: &str) -> String {
+fn take_base_path(requested: Vec<&str>, routed: Vec<&str>) -> String {
 
     let mut s: String = "".to_string();
 
@@ -39,13 +39,10 @@ fn take_base_path(requested: &str, routed: &str) -> String {
         return s
     }
 
-    let route: Vec<&str> = routed.split('/').collect();
-    let req: Vec<&str> = requested.split('/').collect();
-
     let mut i = 0;
 
-    for t in req {
-        if route.len() - 1 == i {
+    for t in requested {
+        if routed.len() - 1 == i {
             break
         }
         if t == "" {
@@ -53,7 +50,7 @@ fn take_base_path(requested: &str, routed: &str) -> String {
             continue
         }
 
-        if t == route[i] {
+        if t == routed[i] {
             break
         } else {
             s.push_str(&format!("{}/", t));
@@ -164,7 +161,7 @@ mod test {
 
     #[test]
     fn test_take_base_path() {
-        let s = take_base_path("/mounted/foo/bar", "/foo/:biz");
+        let s = take_base_path(vec!("mounted","foo", "bar"), vec!("foo",":biz"));
         assert_eq!(s, "mounted/");
     }
 }
